@@ -1,0 +1,103 @@
+<!doctype html>
+ <html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>扇形园</title>
+  <style>
+   #canvas
+   {
+    margin: 0 auto;
+    display: block;
+    }
+   </style>
+<script>
+Array.prototype.indexOf = function (obj) {  
+    for (var i = 0; i < this.length; i++) {  
+        if (this[i] == obj) {  
+            return i;  
+        }  
+    }  
+    return -1;  
+}
+CanvasRenderingContext2D.prototype.sector = function(angle, color, per, radius)
+{
+    this.save();
+    this.translate(150,150);
+    this.rotate(Math.PI/180*per);
+    this.fillStyle = color;
+    this.beginPath(); 
+    this.moveTo(0,0);
+    this.arc(0, 0, radius, 0, Math.PI/180*angle, false);
+    this.closePath();
+    this.fill();
+    this.restore();
+}
+
+//数据参数
+var num = [250, 590, 1076];
+
+window.onload = function()
+{
+    var ctx = document.getElementById("canvas").getContext("2d");
+    function drawArcLine(radius)
+    {
+        ctx.save();
+        ctx.translate(150,150);
+        ctx.strokeStyle = "#ccc";
+        ctx.fillStyle = "#FFF";
+        ctx.beginPath(); 
+        ctx.arc(0, 0, radius, 0, Math.PI*2, false);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    var angle = 0;
+    var totalNum = eval(num.join("+"));
+    var colorArry = ["#FFC952","#FF7372", "#47B8E0"];
+    var widthArray = [120, 100, 80];
+    var numPer = [];
+
+    num.sort(function(a,b){return a<b?1:-1});
+    for(var i=0; i<num.length; i++){
+    	numPer[i] = num[i]/totalNum * 360;
+    }
+    maxPer = Math.max.apply(null,numPer);
+
+    var timer =setInterval(function(){
+        var per = 0;
+    	angle+=1;
+    	if(angle >= maxPer)
+		{
+			clearInterval(timer);
+		}
+		ctx.clearRect(0,0,300,300);
+        drawArcLine(130);
+
+    	for (var i = 0; i<numPer.length; i++) {
+            if(i != numPer.indexOf(maxPer)){
+                if(angle <= numPer[i]){
+                    ctx.sector(angle, colorArry[i], per, widthArray[i]);
+                 } else {
+                    ctx.sector(numPer[i], colorArry[i], per, widthArray[i]);
+                 }
+            } else {
+                ctx.sector(angle, colorArry[i], per, widthArray[i]);
+            }
+            per+=numPer[i];
+    	};
+
+        drawArcLine(20);
+        drawArcLine(13);    
+	},10);
+
+    //圆角坐标
+    //(R*Math.cos(Math.PI/180*angle), R*Math.sin(Math.PI/180*angle));
+}
+</script>
+</head>
+<body>
+<canvas id="canvas" width="300" height="300"></canvas>
+</body>
+</html>
